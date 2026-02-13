@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>💝 Reeva-lentine!</title>
+    <title>💝 Be My Valentine?</title>
     <style>
         /* ===== RESET AND BASIC STYLES ===== */
         * {
@@ -87,7 +87,7 @@
         .subtitle {
             font-size: 1.4em;
             color: #ad1457;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
             font-weight: 600;
         }
 
@@ -135,10 +135,10 @@
             background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
             color: white;
             border: none;
-            padding: 18px 55px;
-            font-size: 1.4em;
-            font-weight: 700;
-            border-radius: 50px;
+            padding: 22px 70px;
+            font-size: 1.8em;
+            font-weight: 900;
+            border-radius: 60px;
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
             position: relative;
             transition: all 0.15s ease-out;
@@ -147,6 +147,8 @@
             cursor: not-allowed;
             z-index: 100;
             pointer-events: auto;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         /* Cursor changes when hovering near No button */
@@ -253,8 +255,8 @@
                 padding: 20px 55px; 
             }
             .no-btn { 
-                font-size: 1.2em; 
-                padding: 16px 45px; 
+                font-size: 1.5em; 
+                padding: 20px 55px; 
             }
             .emoji-main { font-size: 80px; }
             .success-emoji { font-size: 100px; }
@@ -264,8 +266,10 @@
                 gap: 20px;
             }
             .photo-placeholder {
-                width: 200px;
-                height: 200px;
+                max-width: 350px;
+            }
+            .photo-small {
+                max-width: 350px;
             }
         }
 
@@ -276,15 +280,17 @@
                 padding: 18px 40px; 
             }
             .no-btn { 
-                font-size: 1.1em; 
-                padding: 14px 30px; 
+                font-size: 1.3em; 
+                padding: 18px 40px; 
             }
             .buttons-container {
                 gap: 15px;
             }
             .photo-placeholder {
-                width: 150px;
-                height: 150px;
+                max-width: 280px;
+            }
+            .photo-small {
+                max-width: 280px;
             }
         }
 
@@ -298,10 +304,11 @@
 
         /* ===== PHOTO PLACEHOLDERS ===== */
         .photo-placeholder {
-            width: 250px;
-            height: 250px;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
             border-radius: 20px;
-            object-fit: cover;
+            object-fit: contain;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             border: 5px solid white;
             margin: 20px auto;
@@ -314,30 +321,45 @@
         }
 
         .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
             margin: 30px 0;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
+            align-items: center;
+        }
+
+        .photo-item {
+            width: 100%;
+            text-align: center;
         }
 
         .photo-small {
             width: 100%;
-            height: 200px;
+            max-width: 500px;
+            height: auto;
             border-radius: 15px;
-            object-fit: cover;
+            object-fit: contain;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             border: 4px solid white;
-            background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);
+            background: white;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+
+        .photo-caption {
+            font-size: 1.1em;
+            color: #ad1457;
+            font-weight: 600;
+            font-style: italic;
+            margin-top: 10px;
+            padding: 0 20px;
         }
 
         .upload-hint {
-            font-size: 0.9em;
-            color: #999;
-            margin-top: 10px;
-            font-style: italic;
+            display: none;
         }
 
         /* ===== ALREADY ACCEPTED SCREEN ===== */
@@ -455,13 +477,21 @@
                 <p class="success-text">You've made me the happiest!</p>
                 <p class="success-text">I love you so much! ❤️</p>
                 
-                <!-- PHOTO GRID - Add multiple photos here -->
+                <!-- PHOTO GRID - Add multiple photos here with captions -->
                 <div class="photos-grid">
-                    <img id="successPhoto1" src="" alt="Memory 1" class="photo-small hidden">
-                    <img id="successPhoto2" src="" alt="Memory 2" class="photo-small hidden">
-                    <img id="successPhoto3" src="" alt="Memory 3" class="photo-small hidden">
+                    <div class="photo-item">
+                        <img id="successPhoto1" src="" alt="Memory 1" class="photo-small hidden">
+                        <p class="photo-caption" id="caption1"></p>
+                    </div>
+                    <div class="photo-item">
+                        <img id="successPhoto2" src="" alt="Memory 2" class="photo-small hidden">
+                        <p class="photo-caption" id="caption2"></p>
+                    </div>
+                    <div class="photo-item">
+                        <img id="successPhoto3" src="" alt="Memory 3" class="photo-small hidden">
+                        <p class="photo-caption" id="caption3"></p>
+                    </div>
                 </div>
-                <p class="upload-hint">💡 Add up to 3 special photos in the success screen!</p>
                 
                 <div class="hearts-row">😍 💕 🥰 💖 ✨</div>
             </div>
@@ -500,6 +530,11 @@
             
             // Photo shown when they return after accepting
             memoryPhoto: 'https://raw.githubusercontent.com/WNobsi/reeva-lentine/a20233da616d41aa9569e05336e03134c0e12b7d/photos/memory-photo.jpg'  // Example: 'https://i.imgur.com/memory.jpg'
+            
+            // Captions for success screen photos
+            caption1: 'You have showed me a part of life which I had never expected I will ever experience. I never knew what happiness or sadness actually meant. And yet all I could see was you and your smile. Making me realize what happiness meant.', // Example: 'Our first date at the beach'
+            caption2: 'The smile and serenity you had shown to me when you looked at me that way. I will fight myself and my worse demons to have your hand and mind back to comfort and safety. To being mine.', // Example: 'When you made me laugh so hard'
+            caption3: 'I promise to Respect you. Hold you. Protect you. Grow with you. Live with you. Be with you in every aspect of life possible. I swear to you. Nothing comes close to the way you make me smile and the way you make me feel happy.'  // Example: 'Forever my favorite person'
         };
 
         // Get all elements
@@ -521,6 +556,9 @@
         const successPhoto2 = document.getElementById('successPhoto2');
         const successPhoto3 = document.getElementById('successPhoto3');
         const memoryPhoto = document.getElementById('memoryPhoto');
+        const caption1 = document.getElementById('caption1');
+        const caption2 = document.getElementById('caption2');
+        const caption3 = document.getElementById('caption3');
 
         // ===== LOAD IMAGES IF URLs ARE PROVIDED =====
         function loadImages() {
@@ -543,6 +581,17 @@
             if (IMAGE_CONFIG.memoryPhoto) {
                 memoryPhoto.src = IMAGE_CONFIG.memoryPhoto;
                 memoryPhoto.classList.remove('hidden');
+            }
+            
+            // Load captions
+            if (IMAGE_CONFIG.caption1) {
+                caption1.textContent = IMAGE_CONFIG.caption1;
+            }
+            if (IMAGE_CONFIG.caption2) {
+                caption2.textContent = IMAGE_CONFIG.caption2;
+            }
+            if (IMAGE_CONFIG.caption3) {
+                caption3.textContent = IMAGE_CONFIG.caption3;
             }
         }
 
@@ -658,7 +707,7 @@
             return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         }
 
-        // Move button away from touch/mouse position
+        // Move button to random position on screen
         function moveButtonAway(touchX, touchY) {
             if (isMoving) return;
             
@@ -683,24 +732,6 @@
                 noBtn.style.position = 'fixed';
             }
             
-            // Get current button position
-            const btnCenterX = noBtnRect.left + noBtnRect.width / 2;
-            const btnCenterY = noBtnRect.top + noBtnRect.height / 2;
-            
-            // Calculate direction away from touch
-            const deltaX = btnCenterX - touchX;
-            const deltaY = btnCenterY - touchY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
-            // Normalize direction
-            const dirX = deltaX / distance;
-            const dirY = deltaY / distance;
-            
-            // Calculate new position (move away from touch)
-            const moveDistance = 150 + Math.random() * 100;
-            let newX = btnCenterX + dirX * moveDistance;
-            let newY = btnCenterY + dirY * moveDistance;
-            
             // Get button dimensions
             const btnWidth = noBtn.offsetWidth;
             const btnHeight = noBtn.offsetHeight;
@@ -710,8 +741,39 @@
             const maxX = window.innerWidth - btnWidth - padding;
             const maxY = window.innerHeight - btnHeight - padding;
             
-            newX = Math.max(padding, Math.min(newX - btnWidth / 2, maxX));
-            newY = Math.max(padding, Math.min(newY - btnHeight / 2, maxY));
+            // Generate completely random position anywhere on screen
+            let newX = Math.random() * maxX;
+            let newY = Math.random() * maxY;
+            
+            // Ensure button doesn't overlap with YES button
+            const yesBtnRect = yesBtn.getBoundingClientRect();
+            const minDistance = 150; // Minimum distance from YES button
+            
+            let attempts_random = 0;
+            while (attempts_random < 10) {
+                const centerX = newX + btnWidth / 2;
+                const centerY = newY + btnHeight / 2;
+                const yesCenterX = yesBtnRect.left + yesBtnRect.width / 2;
+                const yesCenterY = yesBtnRect.top + yesBtnRect.height / 2;
+                
+                const distance = Math.sqrt(
+                    Math.pow(centerX - yesCenterX, 2) + 
+                    Math.pow(centerY - yesCenterY, 2)
+                );
+                
+                if (distance > minDistance) {
+                    break; // Good position found
+                }
+                
+                // Try a new random position
+                newX = Math.random() * maxX;
+                newY = Math.random() * maxY;
+                attempts_random++;
+            }
+            
+            // Ensure within bounds
+            newX = Math.max(padding, Math.min(newX, maxX));
+            newY = Math.max(padding, Math.min(newY, maxY));
             
             // Apply new position
             noBtn.style.left = newX + 'px';
