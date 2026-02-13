@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>💝 Be My Valentine?</title>
+    <style>
+        /* ===== RESET AND BASIC STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #ffd1ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            touch-action: pan-y;
+        }
+
+        /* ===== ANIMATED BACKGROUND HEARTS ===== */
+        .heart-bg {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.15;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg); 
+                opacity: 0.15;
+            }
+            50% { 
+                transform: translateY(-30px) rotate(10deg); 
+                opacity: 0.25;
+            }
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            text-align: center;
+            padding: 30px 20px;
+            max-width: 600px;
+            width: 95%;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ===== QUESTION SCREEN ===== */
+        #question-screen {
+            display: block;
+        }
+
+        .emoji-main {
+            font-size: 100px;
+            animation: bounce 2s ease-in-out infinite;
+            margin-bottom: 20px;
+            user-select: none;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.1); }
+        }
+
+        h1 {
+            font-size: 2.8em;
+            color: #d81b60;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.1);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.4em;
+            color: #ad1457;
+            margin-bottom: 50px;
+            font-weight: 600;
+        }
+
+        /* ===== BUTTONS CONTAINER ===== */
+        .buttons-container {
+            position: relative;
+            min-height: 250px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== YES BUTTON ===== */
+        .yes-btn {
+            background: linear-gradient(135deg, #f50057 0%, #c51162 100%);
+            color: white;
+            border: none;
+            padding: 22px 70px;
+            font-size: 1.8em;
+            font-weight: 900;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(245, 0, 87, 0.5);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 300;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .yes-btn:hover {
+            transform: scale(1.15) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(245, 0, 87, 0.7);
+        }
+
+        .yes-btn:active {
+            transform: scale(1.05);
+        }
+
+        /* ===== NO BUTTON (THE ELUSIVE ONE) ===== */
+        .no-btn {
+            background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+            color: white;
+            border: none;
+            padding: 18px 55px;
+            font-size: 1.4em;
+            font-weight: 700;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            position: fixed;
+            transition: all 0.15s ease-out;
+            touch-action: none;
+            user-select: none;
+            cursor: not-allowed;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        /* Cursor changes when hovering near No button */
+        .no-btn:hover {
+            cursor: not-allowed;
+        }
+
+        /* ===== HINT MESSAGE ===== */
+        .hint {
+            margin-top: 25px;
+            font-size: 1.3em;
+            color: #c51162;
+            font-weight: 700;
+            display: none;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.05);
+            }
+        }
+
+        /* ===== SUCCESS SCREEN ===== */
+        #success-screen {
+            display: none;
+        }
+
+        .success-content {
+            animation: zoomInRotate 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes zoomInRotate {
+            from { 
+                transform: scale(0) rotate(-180deg); 
+                opacity: 0; 
+            }
+            to { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 1; 
+            }
+        }
+
+        .success-emoji {
+            font-size: 140px;
+            margin-bottom: 30px;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            10%, 30% { transform: scale(1.2); }
+            20%, 40% { transform: scale(1.1); }
+        }
+
+        .success-title {
+            font-size: 3.5em;
+            color: #f50057;
+            margin-bottom: 25px;
+            font-weight: 900;
+            text-shadow: 4px 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .success-text {
+            font-size: 1.8em;
+            color: #c51162;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .hearts-row {
+            font-size: 3.5em;
+            margin-top: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* ===== ATTEMPT COUNTER ===== */
+        .attempt-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #d81b60;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 300;
+            display: none;
+        }
+
+        /* ===== MOBILE RESPONSIVENESS ===== */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2em; }
+            .subtitle { font-size: 1.2em; }
+            .yes-btn { 
+                font-size: 1.5em; 
+                padding: 20px 55px; 
+            }
+            .no-btn { 
+                font-size: 1.2em; 
+                padding: 16px 45px; 
+            }
+            .emoji-main { font-size: 80px; }
+            .success-emoji { font-size: 100px; }
+            .success-title { font-size: 2.5em; }
+            .success-text { font-size: 1.4em; }
+            .buttons-container {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            h1 { font-size: 1.8em; }
+            .yes-btn { 
+                font-size: 1.3em; 
+                padding: 18px 40px; 
+            }
+            .no-btn { 
+                font-size: 1.1em; 
+                padding: 14px 30px; 
+            }
+            .buttons-container {
+                gap: 15px;
+            }
+        }
+
+        /* Stack buttons vertically on very small screens */
+        @media (max-width: 350px) {
+            .buttons-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        /* ===== TOUCH DETECTION RING ===== */
+        .touch-ring {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            border: 3px dashed #f50057;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 50;
+            transform: translate(-50%, -50%);
+        }
+
+        .touch-ring.active {
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background floating hearts -->
+    <div class="heart-bg" style="left: 5%; top: 15%; animation-delay: 0s;">❤️</div>
+    <div class="heart-bg" style="left: 85%; top: 25%; animation-delay: 1s;">💕</div>
+    <div class="heart-bg" style="left: 10%; top: 75%; animation-delay: 2s;">💖</div>
+    <div class="heart-bg" style="left: 90%; top: 65%; animation-delay: 1.5s;">💗</div>
+    <div class="heart-bg" style="left: 50%; top: 10%; animation-delay: 0.5s;">💝</div>
+    <div class="heart-bg" style="left: 25%; top: 50%; animation-delay: 2.5s;">💘</div>
+    <div class="heart-bg" style="left: 75%; top: 85%; animation-delay: 3s;">💞</div>
+
+    <!-- Attempt counter -->
+    <div class="attempt-counter" id="attemptCounter">
+        Attempts: <span id="attemptCount">0</span>
+    </div>
+
+    <!-- Touch detection ring (visual feedback) -->
+    <div class="touch-ring" id="touchRing"></div>
+
+    <!-- Main container -->
+    <div class="container">
+        <!-- Question screen -->
+        <div id="question-screen">
+            <div class="emoji-main">💌</div>
+            <h1>Will You Be My Valentine?</h1>
+            <p class="subtitle">You mean the world to me! 💕</p>
+            
+            <div class="buttons-container">
+                <button class="yes-btn" id="yesBtn">Yes! 💖</button>
+                <button class="no-btn" id="noBtn">No</button>
+            </div>
+            
+            <div class="hint" id="hint"></div>
+        </div>
+
+        <!-- Success screen -->
+        <div id="success-screen">
+            <div class="success-content">
+                <div class="success-emoji">💝</div>
+                <h1 class="success-title">Yay! 🎉</h1>
+                <p class="success-text">You've made me the happiest!</p>
+                <p class="success-text">I love you so much! ❤️</p>
+                <div class="hearts-row">😍 💕 🥰 💖 ✨</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT - THE MAGIC ===== -->
+    <script>
+        // Get all elements
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const questionScreen = document.getElementById('question-screen');
+        const successScreen = document.getElementById('success-screen');
+        const hint = document.getElementById('hint');
+        const attemptCounter = document.getElementById('attemptCounter');
+        const attemptCount = document.getElementById('attemptCount');
+        const touchRing = document.getElementById('touchRing');
+
+        // State variables
+        let attempts = 0;
+        let isMoving = false;
+        let noBtnRect = null;
+        const DETECTION_RADIUS = 120; // Distance in pixels to detect finger proximity
+
+        // Messages that change as user keeps trying
+        const hintMessages = [
+            "Oops! Almost got it! 😏",
+            "So close! Try again! 😜",
+            "Not quite! 🙈",
+            "The button is shy! 🙊",
+            "It's playing hard to get! 💔",
+            "Come on, you know the answer! 😊",
+            "Just say yes already! 🥺",
+            "The button agrees - say YES! 💕",
+            "Why resist? Say yes! 😍",
+            "You can't catch me! 🏃",
+            "Give up and say yes! ❤️"
+        ];
+
+        // Button text changes
+        const buttonTexts = [
+            "No",
+            "Nope! 😤",
+            "Not happening! 🙅",
+            "Never! 💔",
+            "No way! 🚫",
+            "Absolutely not! ❌",
+            "Try the YES button! ✨"
+        ];
+
+        // Initialize button position
+        function initializeNoButton() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2 + 30;
+            
+            // Position NO button to the right of YES button
+            const yesBtnRect = yesBtn.getBoundingClientRect();
+            const initialX = yesBtnRect.right + 30; // 30px gap from YES button
+            const initialY = yesBtnRect.top;
+            
+            noBtn.style.left = initialX + 'px';
+            noBtn.style.top = initialY + 'px';
+            updateNoBtnRect();
+        }
+
+        // Update button rectangle for collision detection
+        function updateNoBtnRect() {
+            noBtnRect = noBtn.getBoundingClientRect();
+        }
+
+        // Calculate distance between two points
+        function getDistance(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        // Move button away from touch/mouse position
+        function moveButtonAway(touchX, touchY) {
+            if (isMoving) return;
+            
+            isMoving = true;
+            attempts++;
+            
+            // Update counter
+            attemptCount.textContent = attempts;
+            attemptCounter.style.display = 'block';
+            
+            // Show hint
+            hint.style.display = 'block';
+            hint.textContent = hintMessages[Math.min(attempts - 1, hintMessages.length - 1)];
+            
+            // Change button text
+            if (attempts <= buttonTexts.length) {
+                noBtn.textContent = buttonTexts[Math.min(attempts, buttonTexts.length - 1)];
+            }
+            
+            // Get current button position
+            const btnCenterX = noBtnRect.left + noBtnRect.width / 2;
+            const btnCenterY = noBtnRect.top + noBtnRect.height / 2;
+            
+            // Calculate direction away from touch
+            const deltaX = btnCenterX - touchX;
+            const deltaY = btnCenterY - touchY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            // Normalize direction
+            const dirX = deltaX / distance;
+            const dirY = deltaY / distance;
+            
+            // Calculate new position (move away from touch)
+            const moveDistance = 150 + Math.random() * 100;
+            let newX = btnCenterX + dirX * moveDistance;
+            let newY = btnCenterY + dirY * moveDistance;
+            
+            // Get button dimensions
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+            
+            // Keep button on screen with padding
+            const padding = 20;
+            const maxX = window.innerWidth - btnWidth - padding;
+            const maxY = window.innerHeight - btnHeight - padding;
+            
+            newX = Math.max(padding, Math.min(newX - btnWidth / 2, maxX));
+            newY = Math.max(padding, Math.min(newY - btnHeight / 2, maxY));
+            
+            // Apply new position
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+            
+            // Update rect
+            setTimeout(() => {
+                updateNoBtnRect();
+                isMoving = false;
+            }, 150);
+        }
+
+        // Check if touch is near button
+        function checkProximity(touchX, touchY) {
+            if (!noBtnRect) return false;
+            
+            const btnCenterX = noBtnRect.left + noBtnRect.width / 2;
+            const btnCenterY = noBtnRect.top + noBtnRect.height / 2;
+            
+            const distance = getDistance(touchX, touchY, btnCenterX, btnCenterY);
+            
+            return distance < DETECTION_RADIUS;
+        }
+
+        // Handle touch start (mobile)
+        function handleTouchStart(e) {
+            const touch = e.touches[0];
+            
+            // Show touch ring
+            touchRing.style.left = touch.clientX + 'px';
+            touchRing.style.top = touch.clientY + 'px';
+            touchRing.classList.add('active');
+            
+            if (checkProximity(touch.clientX, touch.clientY)) {
+                e.preventDefault();
+                moveButtonAway(touch.clientX, touch.clientY);
+            }
+        }
+
+        // Handle touch move (when finger moves on screen)
+        function handleTouchMove(e) {
+            const touch = e.touches[0];
+            
+            // Update touch ring position
+            touchRing.style.left = touch.clientX + 'px';
+            touchRing.style.top = touch.clientY + 'px';
+            
+            if (checkProximity(touch.clientX, touch.clientY)) {
+                e.preventDefault();
+                moveButtonAway(touch.clientX, touch.clientY);
+            }
+        }
+
+        // Handle touch end
+        function handleTouchEnd(e) {
+            touchRing.classList.remove('active');
+        }
+
+        // Handle mouse enter (desktop)
+        function handleMouseEnter(e) {
+            moveButtonAway(e.clientX, e.clientY);
+        }
+
+        // Handle mouse move (desktop)
+        function handleMouseMove(e) {
+            if (checkProximity(e.clientX, e.clientY)) {
+                moveButtonAway(e.clientX, e.clientY);
+            }
+        }
+
+        // Prevent any click on No button
+        noBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            moveButtonAway(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2);
+            return false;
+        });
+
+        // Prevent mousedown on No button
+        noBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            moveButtonAway(e.clientX, e.clientY);
+            return false;
+        });
+
+        // Touch events for mobile (iOS specific)
+        noBtn.addEventListener('touchstart', handleTouchStart, { passive: false });
+        document.addEventListener('touchmove', handleTouchMove, { passive: false });
+        document.addEventListener('touchend', handleTouchEnd);
+
+        // Mouse events for desktop
+        noBtn.addEventListener('mouseenter', handleMouseEnter);
+        document.addEventListener('mousemove', handleMouseMove);
+
+        // YES button handler
+        yesBtn.addEventListener('click', function() {
+            questionScreen.style.display = 'none';
+            successScreen.style.display = 'block';
+            attemptCounter.style.display = 'none';
+            
+            // Create heart confetti
+            createHeartConfetti();
+            
+            // Add celebration sound (if you want to add audio)
+            // const audio = new Audio('celebration.mp3');
+            // audio.play();
+        });
+
+        // Prevent YES button from being affected
+        yesBtn.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+        });
+
+        // Heart confetti animation
+        function createHeartConfetti() {
+            const hearts = ['❤️', '💕', '💖', '💗', '💝', '💘', '💞', '💓'];
+            const colors = ['#ff1744', '#f50057', '#e91e63', '#ec407a'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    heart.style.position = 'fixed';
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.top = '-50px';
+                    heart.style.fontSize = (Math.random() * 40 + 20) + 'px';
+                    heart.style.zIndex = '10000';
+                    heart.style.pointerEvents = 'none';
+                    heart.style.opacity = '1';
+                    
+                    // Random color tint
+                    heart.style.filter = `hue-rotate(${Math.random() * 60}deg)`;
+                    
+                    document.body.appendChild(heart);
+                    
+                    // Animate falling
+                    const duration = Math.random() * 2000 + 3000;
+                    const drift = (Math.random() - 0.5) * 200;
+                    
+                    setTimeout(() => {
+                        heart.style.transition = `all ${duration}ms ease-in`;
+                        heart.style.top = '120vh';
+                        heart.style.left = `calc(${heart.style.left} + ${drift}px)`;
+                        heart.style.opacity = '0';
+                        heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    }, 50);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        heart.remove();
+                    }, duration + 100);
+                }, i * 80);
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initializeNoButton();
+        });
+
+        // Update on resize
+        window.addEventListener('resize', () => {
+            updateNoBtnRect();
+        });
+
+        // Prevent context menu on long press (iOS)
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Prevent text selection
+        document.addEventListener('selectstart', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
