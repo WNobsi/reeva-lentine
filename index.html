@@ -140,7 +140,7 @@
             font-weight: 700;
             border-radius: 50px;
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            position: fixed;
+            position: relative;
             transition: all 0.15s ease-out;
             touch-action: none;
             user-select: none;
@@ -437,7 +437,7 @@
             <img id="questionPhoto" src="" alt="Our Photo" class="photo-placeholder hidden">
             <p class="upload-hint">💡 Tip: Add your photo by replacing the image source!</p>
             
-            <h1>Reeva Fofaria, Will You make this pakora the happiest and luckiest guy on earth and Be My Valentine?</h1>
+            <h1>Reeva Fofaria, Will You make this pakora the happiest guy on earth and Be My Valentine?</h1>
             <p class="subtitle">You mean the world to me! 💕</p>
             
             <div class="buttons-container">
@@ -599,6 +599,11 @@
             hint.style.display = 'none';
             noBtn.textContent = 'No';
             
+            // Reset NO button position to relative
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '';
+            noBtn.style.top = '';
+            
             // Reinitialize NO button position
             setTimeout(() => {
                 initializeNoButton();
@@ -639,16 +644,8 @@
 
         // Initialize button position
         function initializeNoButton() {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2 + 30;
-            
-            // Position NO button to the right of YES button
-            const yesBtnRect = yesBtn.getBoundingClientRect();
-            const initialX = yesBtnRect.right + 30; // 30px gap from YES button
-            const initialY = yesBtnRect.top;
-            
-            noBtn.style.left = initialX + 'px';
-            noBtn.style.top = initialY + 'px';
+            // Button starts with relative positioning (visible in normal flow)
+            // When it needs to move, we'll change it to fixed
             updateNoBtnRect();
         }
 
@@ -680,6 +677,11 @@
             // Change button text
             if (attempts <= buttonTexts.length) {
                 noBtn.textContent = buttonTexts[Math.min(attempts, buttonTexts.length - 1)];
+            }
+            
+            // Change to fixed positioning on first move
+            if (attempts === 1) {
+                noBtn.style.position = 'fixed';
             }
             
             // Get current button position
