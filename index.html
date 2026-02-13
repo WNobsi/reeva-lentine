@@ -333,7 +333,8 @@
             }
             .photo-caption {
                 font-size: 1em;
-                padding: 0 10px;
+                padding: 12px 18px;
+                max-width: 90%;
             }
         }
 
@@ -360,6 +361,8 @@
             }
             .photo-caption {
                 font-size: 0.95em;
+                padding: 12px 15px;
+                max-width: 95%;
             }
         }
         }
@@ -432,14 +435,30 @@
         }
 
         .photo-caption {
-            font-size: 1.1em;
+            font-size: 1.05em;
             color: #ad1457;
-            font-weight: 600;
+            font-weight: 500;
             font-style: italic;
-            margin-top: 10px;
-            padding: 0 20px;
-            pointer-events: none;
-            user-select: none;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            padding: 15px 25px;
+            line-height: 1.8;
+            text-align: left;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            border-left: 4px solid #f50057;
+        }
+
+        .photo-caption:empty {
+            display: none;
+            margin: 0;
+            padding: 0;
         }
 
         .upload-hint {
@@ -500,6 +519,52 @@
             transform: scale(1.05);
         }
 
+        /* ===== MUSIC PLAYER ===== */
+        .music-player {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .music-note {
+            font-size: 1.1em;
+            color: #c51162;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .audio-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #f50057 0%, #c51162 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: 700;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(245, 0, 87, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(245, 0, 87, 0.6);
+        }
+
+        .play-button:active {
+            transform: scale(0.98);
+        }
+
         /* ===== TOUCH DETECTION RING ===== */
         .touch-ring {
             position: fixed;
@@ -546,7 +611,8 @@
             <!-- PHOTO PLACEHOLDER - Replace src with your image URL -->
             <img id="questionPhoto" src="" alt="Our Photo" class="photo-placeholder hidden">
             
-            <h1>Reeva Fofaria, my Honeybun!, Will You make this pakora the happiest and luckiest guy on earth, Be my Valentine?</h1>
+            <h1>Reeva Fofaria, Will You make this pakora the happiest and luckiest guy on earth, be My Valentine?
+</h1>
             <p class="subtitle">You mean the world to me! 💕</p>
             
             <div class="buttons-container">
@@ -555,6 +621,36 @@
             </div>
             
             <div class="hint" id="hint"></div>
+            
+            <!-- OPTIONAL: Spotify Embed for Music (Legal Way) -->
+            <!-- Uncomment and replace with your Spotify embed code -->
+            <!-- 
+            <div class="music-player">
+                <p class="music-note">🎵 Play our song while you decide 💕</p>
+                <iframe style="border-radius:12px" 
+                    src="YOUR_SPOTIFY_EMBED_URL_HERE" 
+                    width="100%" 
+                    height="80" 
+                    frameBorder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+                </iframe>
+            </div>
+            -->
+            
+            <!-- ALTERNATIVE: Royalty-Free Music Player -->
+            <!-- Upload your own royalty-free music and uncomment this -->
+            <!--
+            <div class="music-player">
+                <p class="music-note">🎵 Our romantic soundtrack 💕</p>
+                <audio id="backgroundMusic" loop>
+                    <source src="photos/romantic-music.mp3" type="audio/mpeg">
+                    Your browser does not support audio.
+                </audio>
+                <button class="play-button" id="playMusicBtn">🎵 Play Music</button>
+            </div>
+            -->
         </div>
 
         <!-- Success screen -->
@@ -610,6 +706,7 @@
     <script>
         // ===== CONFIGURATION: ADD YOUR IMAGE URLs HERE =====
         const IMAGE_CONFIG = {
+
             questionPhoto: 'https://raw.githubusercontent.com/WNobsi/reeva-lentine/a20233da616d41aa9569e05336e03134c0e12b7d/photos/question-photo.jpg', // Example: 'https://i.imgur.com/yourimage.jpg'
             
             // Photos on success screen (shown after they say yes)
@@ -618,13 +715,38 @@
             successPhoto3: 'https://raw.githubusercontent.com/WNobsi/reeva-lentine/a20233da616d41aa9569e05336e03134c0e12b7d/photos/success-3.jpg', // Example: 'photos/us3.jpg'
             
             // Photo shown when they return after accepting
-            memoryPhoto: 'https://raw.githubusercontent.com/WNobsi/reeva-lentine/a20233da616d41aa9569e05336e03134c0e12b7d/photos/memory-photo.jpg'  // Example: 'https://i.imgur.com/memory.jpg'
+            memoryPhoto: 'https://raw.githubusercontent.com/WNobsi/reeva-lentine/a20233da616d41aa9569e05336e03134c0e12b7d/photos/memory-photo.jpg'
             
-            // Captions for success screen photos
+            // Captions for success screen photos (supports up to 500 words each!)
             caption1: 'You have showed me a part of life which I had never expected I will ever experience. I never knew what happiness or sadness actually meant. And yet all I could see was you and your smile. Making me realize what happiness meant.', // Example: 'Our first date at the beach'
             caption2: 'The smile and serenity you had shown to me when you looked at me that way. I will fight myself and my worse demons to have your hand and mind back to comfort and safety. To being mine.', // Example: 'When you made me laugh so hard'
             caption3: 'I promise to Respect you. Hold you. Protect you. Grow with you. Live with you. Be with you in every aspect of life possible. I swear to you. Nothing comes close to the way you make me smile and the way you make me feel happy.'  // Example: 'Forever my favorite person'
+        
         };
+
+        /* ===== HOW TO WRITE LONG CAPTIONS (UP TO 500 WORDS): =====
+        
+        You can write beautiful, long stories for each photo! Here's an example:
+        
+        caption1: `This photo was taken on our first date at the beach on September 15, 2023. 
+        
+I was so nervous that morning, changing my outfit three times before finally settling on the blue dress you later said was your favorite. When I saw you waiting by the pier, my heart skipped a beat.
+
+We walked for hours along the beach, talking about everything and nothing. You told me about your dreams of traveling the world, and I shared my passion for photography. The sunset that evening was breathtaking, but I couldn't take my eyes off you.
+
+This is the moment I knew you were special. When you reached for my hand as the waves crashed near our feet, everything felt right. It was like the universe had conspired to bring us together.
+
+Thank you for being my person, my best friend, and my forever love. 💕`,
+
+        TIPS FOR WRITING LONG CAPTIONS:
+        - Use backticks ` instead of quotes for multi-line text
+        - Leave blank lines between paragraphs for better readability
+        - Add emojis to make it more personal 💕 🌟 ❤️
+        - Tell the story: What happened? How did you feel? Why is it special?
+        - Include specific details: dates, places, what you were wearing, what was said
+        - Write from the heart - your partner will love reading your memories!
+        
+        ================================================================= */
 
         // Get all elements
         const noBtn = document.getElementById('noBtn');
@@ -1102,6 +1224,32 @@
                 e.preventDefault();
             }
         });
+
+        // ===== MUSIC PLAYER (UNCOMMENT IF USING ROYALTY-FREE AUDIO) =====
+        /*
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const playMusicBtn = document.getElementById('playMusicBtn');
+        let isPlaying = false;
+
+        if (playMusicBtn && backgroundMusic) {
+            playMusicBtn.addEventListener('click', function() {
+                if (!isPlaying) {
+                    backgroundMusic.play();
+                    playMusicBtn.textContent = '⏸️ Pause Music';
+                    isPlaying = true;
+                } else {
+                    backgroundMusic.pause();
+                    playMusicBtn.textContent = '🎵 Play Music';
+                    isPlaying = false;
+                }
+            });
+
+            // Optional: Auto-play on page load (some browsers block this)
+            // backgroundMusic.play().catch(err => {
+            //     console.log('Autoplay prevented by browser');
+            // });
+        }
+        */
     </script>
 </body>
 </html>
