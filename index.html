@@ -268,7 +268,12 @@
             .photo-placeholder {
                 max-width: 350px;
             }
-            .photo-small {
+            .photos-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+            .photo-item {
+                width: 90%;
                 max-width: 350px;
             }
         }
@@ -302,6 +307,14 @@
             }
         }
 
+        /* Tablet - 2 photos per row */
+        @media (min-width: 601px) and (max-width: 900px) {
+            .photo-item {
+                width: 45%;
+                min-width: 200px;
+            }
+        }
+
         /* ===== PHOTO PLACEHOLDERS ===== */
         .photo-placeholder {
             width: 100%;
@@ -322,23 +335,26 @@
 
         .photos-grid {
             display: flex;
-            flex-direction: column;
-            gap: 30px;
+            flex-direction: row;
+            gap: 20px;
             margin: 30px 0;
-            max-width: 600px;
+            max-width: 100%;
             margin-left: auto;
             margin-right: auto;
-            align-items: center;
+            align-items: flex-start;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .photo-item {
-            width: 100%;
+            width: 30%;
+            min-width: 250px;
+            max-width: 350px;
             text-align: center;
         }
 
         .photo-small {
             width: 100%;
-            max-width: 500px;
             height: auto;
             border-radius: 15px;
             object-fit: contain;
@@ -494,6 +510,8 @@
                 </div>
                 
                 <div class="hearts-row">😍 💕 🥰 💖 ✨</div>
+                
+                <button class="reset-btn" id="resetBtnSuccess">Ask Me Again 🔄</button>
             </div>
         </div>
 
@@ -548,6 +566,7 @@
         const attemptCount = document.getElementById('attemptCount');
         const touchRing = document.getElementById('touchRing');
         const resetBtn = document.getElementById('resetBtn');
+        const resetBtnSuccess = document.getElementById('resetBtnSuccess');
         const acceptanceDate = document.getElementById('acceptanceDate');
 
         // Image elements
@@ -640,6 +659,33 @@
             // Reset UI
             alreadyAcceptedScreen.style.display = 'none';
             successScreen.style.display = 'none';
+            questionScreen.style.display = 'block';
+            attempts = 0;
+            attemptCount.textContent = '0';
+            attemptCounter.style.display = 'none';
+            hint.style.display = 'none';
+            noBtn.textContent = 'No';
+            
+            // Reset NO button position to relative
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '';
+            noBtn.style.top = '';
+            
+            // Reinitialize NO button position
+            setTimeout(() => {
+                initializeNoButton();
+            }, 100);
+        });
+
+        // ===== RESET FUNCTION FOR SUCCESS SCREEN =====
+        resetBtnSuccess.addEventListener('click', function() {
+            // Clear localStorage
+            localStorage.removeItem('valentine_accepted');
+            localStorage.removeItem('valentine_accepted_date');
+            
+            // Reset UI
+            successScreen.style.display = 'none';
+            alreadyAcceptedScreen.style.display = 'none';
             questionScreen.style.display = 'block';
             attempts = 0;
             attemptCount.textContent = '0';
@@ -850,7 +896,7 @@
             e.stopPropagation();
             moveButtonAway(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2);
             return false;
-        });
+        }, true);
 
         // Prevent mousedown on No button
         noBtn.addEventListener('mousedown', (e) => {
@@ -858,19 +904,27 @@
             e.stopPropagation();
             moveButtonAway(e.clientX, e.clientY);
             return false;
-        });
+        }, true);
 
         // Touch events for mobile (iOS specific)
-        noBtn.addEventListener('touchstart', handleTouchStart, { passive: false });
-        document.addEventListener('touchmove', handleTouchMove, { passive: false });
-        document.addEventListener('touchend', handleTouchEnd);
+        noBtn.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            e.preventDefault();
+            e.stopPropagation();
+            moveButtonAway(touch.clientX, touch.clientY);
+            return false;
+        }, { passive: false, capture: true });
 
-        // Mouse events for desktop
-        noBtn.addEventListener('mouseenter', handleMouseEnter);
-        document.addEventListener('mousemove', handleMouseMove);
+        // Mouse hover for desktop
+        noBtn.addEventListener('mouseenter', (e) => {
+            e.preventDefault();
+            moveButtonAway(e.clientX, e.clientY);
+        }, true);
 
         // YES button handler
-        yesBtn.addEventListener('click', function() {
+        yesBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
             // Save acceptance to browser memory
             saveAcceptance();
             
@@ -885,7 +939,7 @@
             // Add celebration sound (if you want to add audio)
             // const audio = new Audio('celebration.mp3');
             // audio.play();
-        });
+        }, true);
 
         // Prevent YES button from being affected
         yesBtn.addEventListener('touchstart', (e) => {
@@ -934,9 +988,22 @@
             }
         }
 
-        // Initialize on load
-        window.addEventListener('load', () => {
+        // Initialize on load (using both DOMContentLoaded and load for maximum compatibility)
+        document.addEventListener('DOMContentLoaded', () => {
             // Load all images
+            loadImages();
+            
+            // Check if they already accepted
+            const alreadyAccepted = checkAcceptanceStatus();
+            
+            // Only initialize NO button if showing question screen
+            if (!alreadyAccepted) {
+                initializeNoButton();
+            }
+        });
+
+        window.addEventListener('load', () => {
+            // Load all images again (in case they weren't loaded before)
             loadImages();
             
             // Check if they already accepted
